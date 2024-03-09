@@ -72,7 +72,7 @@ function CreateCabinForm() {
       regularPrice: data.regularPrice,
       discount: data.discount,
       description: data.description,
-      image: data.image,
+      image: data.image[0],
     };
 
     mutate(newCabin);
@@ -162,7 +162,14 @@ function CreateCabinForm() {
 
       <FormRow>
         <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+        <FileInput
+          id="image"
+          accept="image/*"
+          type="file"
+          {...register("image", {
+            required: "This field is required",
+          })}
+        />
       </FormRow>
 
       <FormRow>
@@ -170,7 +177,7 @@ function CreateCabinForm() {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>Edit cabin</Button>
+        <Button disabled={isCreating}>Add cabin</Button>
       </FormRow>
     </Form>
   );
