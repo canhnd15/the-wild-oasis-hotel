@@ -1,14 +1,14 @@
 import styled from "styled-components";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { createUpdateCabin } from "../../services/apiCabins";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCabin } from "../../services/apiCabins";
-import toast from "react-hot-toast";
 
 const FormRow = styled.div`
   display: grid;
@@ -46,13 +46,31 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function CreateCabinForm() {
-  const { register, handleSubmit, formState, reset, getValues } = useForm();
+function CreateCabinForm({ editedCabin = {} }) {
+  const { id: editedId } = editedCabin;
+
+  const editedValues = {
+    name: editedCabin.name,
+    maxCapacity: editedCabin.max_capacity,
+    regularPrice: editedCabin.regular_price,
+    discount: editedCabin.discount,
+    description: editedCabin.description,
+    image: editedCabin.image,
+  };
+
+  const isEditMode = Boolean(editedId);
+
+  const { register, handleSubmit, formState, reset, getValues } = useForm({
+    defaultValues: isEditMode ? editedValues : {},
+  });
+
   const { errors } = formState;
+
   const queryClient = useQueryClient();
 
-  const { mutate, isLoading: isCreating } = useMutation({
-    mutationFn: createCabin,
+  //  1. CREATE NEW CABIN
+  const { mutate: createCabin, isLoading: isCreating } = useMutation({
+    mutationFn: createUpdateCabin,
     onSuccess: () => {
       toast.success("New cabin is created successfully!");
       queryClient.invalidateQueries({
@@ -61,21 +79,42 @@ function CreateCabinForm() {
       reset();
     },
     onError: (err) => {
-      toast.error(<Error> {`Fail to create cabin => ${err.message}`} </Error>);
+      toast.error(<Error> {`${err.message}`} </Error>);
+    },
+  });
+
+  //  2.UPDATE NEW CABIN
+  const { mutate: editCabin, isLoading: isEditing } = useMutation({
+    mutationFn: ({ editedCabinData, id }) =>
+      createUpdateCabin(editedCabinData, id),
+    onSuccess: () => {
+      toast.success("Cabin is updated successfully!");
+      queryClient.invalidateQueries({
+        queryKey: ["cabins"],
+      });
+      reset();
+    },
+    onError: (err) => {
+      toast.error(<Error> {`${err.message}`} </Error>);
     },
   });
 
   function onSubmit(data) {
+    const image = typeof data.image === "string" ? data.image : data.image[0];
     const newCabin = {
       name: data.name,
       maxCapacity: data.maxCapacity,
       regularPrice: data.regularPrice,
       discount: data.discount,
       description: data.description,
-      image: data.image[0],
+      image: image,
     };
 
-    mutate(newCabin);
+    if (isEditMode) {
+      editCabin({ editedCabinData: newCabin, id: editedId });
+    } else {
+      createCabin(newCabin);
+    }
   }
 
   function onError(errors) {
@@ -167,7 +206,7 @@ function CreateCabinForm() {
           accept="image/*"
           type="file"
           {...register("image", {
-            required: "This field is required",
+            required: isEditMode ? false : "This field is required",
           })}
         />
       </FormRow>
@@ -177,7 +216,9 @@ function CreateCabinForm() {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>Add cabin</Button>
+        <Button disabled={isCreating || isEditing}>
+          {isEditMode ? `Edit cabin` : `Add cabin`}
+        </Button>
       </FormRow>
     </Form>
   );
