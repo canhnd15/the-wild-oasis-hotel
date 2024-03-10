@@ -1,14 +1,13 @@
 import styled from "styled-components";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { createUpdateCabin } from "../../services/apiCabins";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
+import { useCreateCabin } from "./useCreateCabin";
+import { useUpdateCabin } from "./useUpdateCabin";
 
 const FormRow = styled.div`
   display: grid;
@@ -64,40 +63,10 @@ function CreateCabinForm({ editedCabin = {} }) {
     defaultValues: isEditMode ? editedValues : {},
   });
 
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useUpdateCabin();
+
   const { errors } = formState;
-
-  const queryClient = useQueryClient();
-
-  //  1. CREATE NEW CABIN
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: createUpdateCabin,
-    onSuccess: () => {
-      toast.success("New cabin is created successfully!");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (err) => {
-      toast.error(<Error> {`${err.message}`} </Error>);
-    },
-  });
-
-  //  2.UPDATE NEW CABIN
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ editedCabinData, id }) =>
-      createUpdateCabin(editedCabinData, id),
-    onSuccess: () => {
-      toast.success("Cabin is updated successfully!");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (err) => {
-      toast.error(<Error> {`${err.message}`} </Error>);
-    },
-  });
 
   function onSubmit(data) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
@@ -111,9 +80,16 @@ function CreateCabinForm({ editedCabin = {} }) {
     };
 
     if (isEditMode) {
-      editCabin({ editedCabinData: newCabin, id: editedId });
+      editCabin(
+        { editedCabinData: newCabin, id: editedId },
+        {
+          onSuccess: (data) => reset(),
+        }
+      );
     } else {
-      createCabin(newCabin);
+      createCabin(newCabin, {
+        onSuccess: (data) => reset(),
+      });
     }
   }
 
