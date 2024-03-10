@@ -1,14 +1,14 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCabin } from "../../services/apiCabins";
-import toast from "react-hot-toast";
 import { useState } from "react";
+import { RiDeleteBin4Fill } from "react-icons/ri";
+import { MdEditSquare } from "react-icons/md";
 import CreateCabinForm from "./CreateCabinForm";
+import { useDeleteCabin } from "./useDeleteCabin";
 
 const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
+  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 0.6fr;
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 2.4rem;
@@ -45,8 +45,14 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: space-around;
+`;
+
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState();
+  const { isDeleting, deleteCabin } = useDeleteCabin();
 
   const {
     id: idCabin,
@@ -57,18 +63,18 @@ function CabinRow({ cabin }) {
     image,
   } = cabin;
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  const { isLoading: isDeleting, mutate } = useMutation({
-    mutationFn: (id) => deleteCabin(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      toast.success("Cabin deleted!");
-    },
-    onError: (err) => toast.error(err.message),
-  });
+  // const { isLoading: isDeleting, mutate } = useMutation({
+  //   mutationFn: (id) => deleteCabin(id),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({
+  //       queryKey: ["cabins"],
+  //     });
+  //     toast.success("Cabin deleted!");
+  //   },
+  //   onError: (err) => toast.error(err.message),
+  // });
 
   return (
     <>
@@ -77,13 +83,19 @@ function CabinRow({ cabin }) {
         <Cabin>{name}</Cabin>
         <div>Fit up to {max_capacity} guests</div>
         <Price>{formatCurrency(regular_price)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
-        <div>
-          <button onClick={() => setShowForm((show) => !show)}>Edit</button>
-          <button onClick={() => mutate(idCabin)} disabled={isDeleting}>
-            Delete
+        {discount ? (
+          <Discount>{formatCurrency(discount)}</Discount>
+        ) : (
+          <span>&mdash;</span>
+        )}
+        <ButtonDiv>
+          <button onClick={() => setShowForm((show) => !show)}>
+            <MdEditSquare size={"24px"} color={"blue"} />
           </button>
-        </div>
+          <button onClick={() => deleteCabin(idCabin)} disabled={isDeleting}>
+            <RiDeleteBin4Fill size={"24px"} color={"red"} />
+          </button>
+        </ButtonDiv>
       </TableRow>
       {showForm && <CreateCabinForm editedCabin={cabin} />}
     </>
