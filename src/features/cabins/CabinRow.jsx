@@ -3,12 +3,15 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import { RiDeleteBin4Fill } from "react-icons/ri";
 import { MdEditSquare } from "react-icons/md";
+import { IoDuplicate } from "react-icons/io5";
+
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
+import { useCreateCabin } from "./useCreateCabin";
 
 const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 0.6fr;
+  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 2.4rem;
@@ -52,6 +55,7 @@ const ButtonDiv = styled.div`
 
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState();
+  const { isCreating, createCabin } = useCreateCabin();
   const { isDeleting, deleteCabin } = useDeleteCabin();
 
   const {
@@ -63,18 +67,16 @@ function CabinRow({ cabin }) {
     image,
   } = cabin;
 
-  // const queryClient = useQueryClient();
-
-  // const { isLoading: isDeleting, mutate } = useMutation({
-  //   mutationFn: (id) => deleteCabin(id),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({
-  //       queryKey: ["cabins"],
-  //     });
-  //     toast.success("Cabin deleted!");
-  //   },
-  //   onError: (err) => toast.error(err.message),
-  // });
+  function handleDuplicate() {
+    createCabin({
+      name: cabin.name,
+      maxCapacity: cabin.max_capacity,
+      regularPrice: cabin.regular_price,
+      discount: cabin.discount,
+      description: cabin.description,
+      image: image,
+    });
+  }
 
   return (
     <>
@@ -94,6 +96,9 @@ function CabinRow({ cabin }) {
           </button>
           <button onClick={() => deleteCabin(idCabin)} disabled={isDeleting}>
             <RiDeleteBin4Fill size={"24px"} color={"red"} />
+          </button>
+          <button onClick={handleDuplicate} disabled={isCreating}>
+            <IoDuplicate size={"24px"} />
           </button>
         </ButtonDiv>
       </TableRow>

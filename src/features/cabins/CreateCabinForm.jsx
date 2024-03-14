@@ -45,7 +45,7 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function CreateCabinForm({ editedCabin = {} }) {
+function CreateCabinForm({ editedCabin = {}, onCloseModel }) {
   const { id: editedId } = editedCabin;
 
   const editedValues = {
@@ -83,12 +83,18 @@ function CreateCabinForm({ editedCabin = {} }) {
       editCabin(
         { editedCabinData: newCabin, id: editedId },
         {
-          onSuccess: (data) => reset(),
+          onSuccess: (data) => {
+            reset();
+            onCloseModel?.();
+          },
         }
       );
     } else {
       createCabin(newCabin, {
-        onSuccess: (data) => reset(),
+        onSuccess: (data) => {
+          reset();
+          onCloseModel?.();
+        },
       });
     }
   }
@@ -98,7 +104,10 @@ function CreateCabinForm({ editedCabin = {} }) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModel ? "modal" : "regular"}
+    >
       <FormRow>
         <Label htmlFor="name">Cabin name</Label>
         <Input
@@ -189,7 +198,11 @@ function CreateCabinForm({ editedCabin = {} }) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModel?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isCreating || isEditing}>
