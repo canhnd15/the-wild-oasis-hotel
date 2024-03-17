@@ -4,6 +4,7 @@ import { RiDeleteBin4Fill } from "react-icons/ri";
 import { MdEditSquare } from "react-icons/md";
 import { IoDuplicate } from "react-icons/io5";
 
+import Menus from "../../ui/Menus";
 import Table from "../../ui/Table";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import CreateCabinForm from "./CreateCabinForm";
@@ -105,18 +106,36 @@ function CabinRow({ cabin }) {
           <Modal.Window name={"delete-cabin"}>
             <ConfirmDelete
               resourceName="cabin"
+              functionName={"Delete"}
               onConfirm={() => deleteCabin(idCabin)}
               disabled={isDeleting}
               onCloseModal={true}
             />
           </Modal.Window>
+
+          <Modal.Open opens={"duplicate-cabin"}>
+            <IoDuplicate size={"24px"} cursor={"pointer"} />
+          </Modal.Open>
+          <Modal.Window name={"duplicate-cabin"}>
+            <ConfirmDelete
+              resourceName="cabin"
+              functionName={"Duplicate"}
+              onConfirm={() => handleDuplicate()}
+              disabled={isCreating}
+              onCloseModal={true}
+            />
+          </Modal.Window>
         </Modal>
-        <IoDuplicate
-          onClick={handleDuplicate}
-          disabled={isCreating}
-          size={"24px"}
-          cursor={"pointer"}
-        />
+
+        {/* <Menus.Menu>
+          <Menus.Toggle id={idCabin} />
+
+          <Menus.List>
+            <Menus.Button>Edit</Menus.Button>
+            <Menus.Button>Delete</Menus.Button>
+            <Menus.Button>Duplicate</Menus.Button>
+          </Menus.List>
+        </Menus.Menu> */}
       </ButtonDiv>
     </Table.Row>
   );
