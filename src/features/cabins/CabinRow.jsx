@@ -4,23 +4,24 @@ import { RiDeleteBin4Fill } from "react-icons/ri";
 import { MdEditSquare } from "react-icons/md";
 import { IoDuplicate } from "react-icons/io5";
 
+import Table from "../../ui/Table";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { useCreateCabin } from "./useCreateCabin";
 import Modal from "../../ui/Modal";
 
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  padding: 1.4rem 2.4rem;
+// const TableRow = styled.div`
+//   display: grid;
+//   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
+//   column-gap: 2.4rem;
+//   align-items: center;
+//   padding: 1.4rem 2.4rem;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-`;
+//   &:not(:last-child) {
+//     border-bottom: 1px solid var(--color-grey-100);
+//   }
+// `;
 
 const Img = styled.img`
   display: block;
@@ -79,7 +80,7 @@ function CabinRow({ cabin }) {
   }
 
   return (
-    <TableRow role="row">
+    <Table.Row>
       <Img src={image} alt={name} />
       <Cabin>{name}</Cabin>
       <div>Fit up to {max_capacity} guests</div>
@@ -117,7 +118,7 @@ function CabinRow({ cabin }) {
           cursor={"pointer"}
         />
       </ButtonDiv>
-    </TableRow>
+    </Table.Row>
   );
 }
 
