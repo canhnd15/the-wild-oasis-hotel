@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
 import { RiDeleteBin4Fill } from "react-icons/ri";
 import { MdEditSquare } from "react-icons/md";
 import { IoDuplicate } from "react-icons/io5";
 
+import ConfirmDelete from "../../ui/ConfirmDelete";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { useCreateCabin } from "./useCreateCabin";
+import Modal from "../../ui/Modal";
 
 const TableRow = styled.div`
   display: grid;
@@ -54,7 +55,6 @@ const ButtonDiv = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const [showForm, setShowForm] = useState();
   const { isCreating, createCabin } = useCreateCabin();
   const { isDeleting, deleteCabin } = useDeleteCabin();
 
@@ -79,31 +79,45 @@ function CabinRow({ cabin }) {
   }
 
   return (
-    <>
-      <TableRow role="row">
-        <Img src={image} alt={name} />
-        <Cabin>{name}</Cabin>
-        <div>Fit up to {max_capacity} guests</div>
-        <Price>{formatCurrency(regular_price)}</Price>
-        {discount ? (
-          <Discount>{formatCurrency(discount)}</Discount>
-        ) : (
-          <span>&mdash;</span>
-        )}
-        <ButtonDiv>
-          <button onClick={() => setShowForm((show) => !show)}>
-            <MdEditSquare size={"24px"} color={"blue"} />
-          </button>
-          <button onClick={() => deleteCabin(idCabin)} disabled={isDeleting}>
-            <RiDeleteBin4Fill size={"24px"} color={"red"} />
-          </button>
-          <button onClick={handleDuplicate} disabled={isCreating}>
-            <IoDuplicate size={"24px"} />
-          </button>
-        </ButtonDiv>
-      </TableRow>
-      {showForm && <CreateCabinForm editedCabin={cabin} />}
-    </>
+    <TableRow role="row">
+      <Img src={image} alt={name} />
+      <Cabin>{name}</Cabin>
+      <div>Fit up to {max_capacity} guests</div>
+      <Price>{formatCurrency(regular_price)}</Price>
+      {discount ? (
+        <Discount>{formatCurrency(discount)}</Discount>
+      ) : (
+        <span>&mdash;</span>
+      )}
+      <ButtonDiv>
+        <Modal>
+          <Modal.Open opens={"edit-cabin"}>
+            <MdEditSquare size={"24px"} color={"blue"} cursor={"pointer"} />
+          </Modal.Open>
+          <Modal.Window name={"edit-cabin"}>
+            <CreateCabinForm editedCabin={cabin} />
+          </Modal.Window>
+
+          <Modal.Open opens={"delete-cabin"}>
+            <RiDeleteBin4Fill size={"24px"} color={"red"} cursor={"pointer"} />
+          </Modal.Open>
+          <Modal.Window name={"delete-cabin"}>
+            <ConfirmDelete
+              resourceName="cabin"
+              onConfirm={() => deleteCabin(idCabin)}
+              disabled={isDeleting}
+              onCloseModal={true}
+            />
+          </Modal.Window>
+        </Modal>
+        <IoDuplicate
+          onClick={handleDuplicate}
+          disabled={isCreating}
+          size={"24px"}
+          cursor={"pointer"}
+        />
+      </ButtonDiv>
+    </TableRow>
   );
 }
 
