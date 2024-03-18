@@ -36,15 +36,12 @@ const Amount = styled.div`
 
 function BookingRow({
   booking: {
-    id: bookingId,
-    created_at,
-    startDate,
-    endDate,
-    numNights,
-    numGuests,
-    totalPrice,
+    start_date: startDate,
+    end_date: endDate,
+    num_nights: numNights,
+    total_price: totalPrice,
     status,
-    guests: { fullName: guestName, email },
+    guests: { full_name, email },
     cabins: { name: cabinName },
   },
 }) {
@@ -59,7 +56,7 @@ function BookingRow({
       <Cabin>{cabinName}</Cabin>
 
       <Stacked>
-        <span>{guestName}</span>
+        <span>{full_name}</span>
         <span>{email}</span>
       </Stacked>
 
