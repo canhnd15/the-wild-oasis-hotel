@@ -1,14 +1,37 @@
 import supabase from "./supabase";
 import { SUPABASE_URL } from "../services/supabase";
+import { PAGE_SIZE } from "../utils/constants";
 
-export async function getCabins() {
-  const { data, error } = await supabase.from("cabins").select("*");
+export async function getCabins({ filter, sortBy, page }) {
+  let query = supabase.from("cabins").select("*", { count: "exact" });
+
+  //filter
+  if (filter) {
+    if (filter.value === "eq") query = query.eq(filter.field, 0);
+    if (filter.value === "gt") query = query.gt(filter.field, 0);
+  }
+
+  //sort by
+  if (sortBy)
+    query = query.order(sortBy.field, {
+      ascending: sortBy.direction === "asc",
+    });
+
+  //pagination
+  if (page) {
+    if (sortBy || filter) page = 1;
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     throw new Error("Cabins could not be loaded.");
   }
 
-  return data;
+  return { data, count };
 }
 
 export async function deleteCabin(id) {

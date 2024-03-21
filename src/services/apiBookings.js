@@ -23,6 +23,7 @@ export async function getBookings({ filter, sortBy, page }) {
 
   // PAGINATION
   if (page) {
+    if (sortBy || filter) page = 1;
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
     query = query.range(from, to);
