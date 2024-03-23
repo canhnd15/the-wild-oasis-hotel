@@ -23,7 +23,6 @@ export async function getBookings({ filter, sortBy, page }) {
 
   // PAGINATION
   if (page) {
-    if (sortBy || filter) page = 1;
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
     query = query.range(from, to);
@@ -107,16 +106,17 @@ export async function getStaysTodayActivity() {
   return data;
 }
 
-export async function updateBooking(id, obj) {
-  const { data, error } = await supabase
+export async function updateBooking(bookingId, obj) {
+  const query = supabase
     .from("bookings")
     .update(obj)
-    .eq("id", id)
+    .eq("id", bookingId)
     .select()
     .single();
 
+  const { data, error } = await query;
+
   if (error) {
-    console.error(error);
     throw new Error("Booking could not be updated");
   }
   return data;

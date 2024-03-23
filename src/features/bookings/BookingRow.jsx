@@ -6,7 +6,8 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
-import { HiEye } from "react-icons/hi2";
+import { HiMiniArrowRightOnRectangle } from "react-icons/hi2";
+import { TbListDetails } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
 const Cabin = styled.div`
@@ -34,6 +35,11 @@ const Stacked = styled.div`
 const Amount = styled.div`
   font-family: "Sono";
   font-weight: 500;
+`;
+
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 function BookingRow({
@@ -80,11 +86,20 @@ function BookingRow({
       <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
-      <HiEye
-        size={"24px"}
-        cursor={"pointer"}
-        onClick={() => navigate(`/bookings/${bookingId}`)}
-      />
+      <ButtonDiv>
+        <TbListDetails
+          size={"24px"}
+          cursor={"pointer"}
+          onClick={() => navigate(`/bookings/${bookingId}`)}
+        />
+        {status === "unconfirmed" && (
+          <HiMiniArrowRightOnRectangle
+            size={"24px"}
+            cursor={"pointer"}
+            onClick={() => navigate(`/check-in/${bookingId}`)}
+          />
+        )}
+      </ButtonDiv>
     </Table.Row>
   );
 }
