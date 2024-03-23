@@ -106,11 +106,11 @@ export async function getStaysTodayActivity() {
   return data;
 }
 
-export async function updateBooking(bookingId, obj) {
+export async function updateBooking(id, obj) {
   const query = supabase
     .from("bookings")
     .update(obj)
-    .eq("id", bookingId)
+    .eq("id", id)
     .select()
     .single();
 
