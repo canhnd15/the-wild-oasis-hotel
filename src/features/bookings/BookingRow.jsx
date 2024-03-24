@@ -6,9 +6,20 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
-import { HiMiniArrowRightOnRectangle } from "react-icons/hi2";
+import {
+  HiMiniArrowRightOnRectangle,
+  HiArrowUpOnSquare,
+} from "react-icons/hi2";
+import { MdDelete } from "react-icons/md";
 import { TbListDetails } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+import {
+  STATUS_CHECKED_IN,
+  STATUS_CHECKED_OUT,
+  STATUS_UNCONFIRMED,
+} from "../../utils/constants";
+import { useCheckingOut } from "../check-in-out/useCheckingOut";
+import { useDeleteBooking } from "./useDeleteBooking";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -55,11 +66,22 @@ function BookingRow({
   },
 }) {
   const navigate = useNavigate();
+  const { isChecking, checkOut } = useCheckingOut();
+  const { isDeleting, doDeleteBooking } = useDeleteBooking();
+
   const statusToTagName = {
     unconfirmed: "blue",
     "checked-in": "green",
     "checked-out": "silver",
   };
+
+  function handleCheckout() {
+    checkOut(bookingId);
+  }
+
+  function handleDelete() {
+    doDeleteBooking(bookingId);
+  }
 
   return (
     <Table.Row>
@@ -92,11 +114,30 @@ function BookingRow({
           cursor={"pointer"}
           onClick={() => navigate(`/bookings/${bookingId}`)}
         />
-        {status === "unconfirmed" && (
+        {status === STATUS_UNCONFIRMED && (
           <HiMiniArrowRightOnRectangle
             size={"24px"}
             cursor={"pointer"}
+            color="blue"
             onClick={() => navigate(`/check-in/${bookingId}`)}
+          />
+        )}
+
+        {status === STATUS_CHECKED_IN && (
+          <HiArrowUpOnSquare
+            size={"24px"}
+            cursor={"pointer"}
+            color="green"
+            onClick={() => handleCheckout()}
+          />
+        )}
+
+        {status === STATUS_CHECKED_OUT && (
+          <MdDelete
+            size={"24px"}
+            cursor={"pointer"}
+            color="red"
+            onClick={() => handleDelete()}
           />
         )}
       </ButtonDiv>
