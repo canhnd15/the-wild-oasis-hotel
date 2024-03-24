@@ -9,9 +9,9 @@ export function useLogin() {
 
   const { mutate: loginWithEmailPwd, isLoading: isLogging } = useMutation({
     mutationFn: ({ email, password }) => login({ email, password }),
-    onSuccess: (user) => {
-      queryClient.setQueryData(["user"], user);
-      navigate("/dashboard");
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], data.user);
+      navigate("/dashboard", { replace: true });
     },
 
     onError: (err) => {
