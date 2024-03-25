@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/useAuth";
+import { login } from "../../services/apiAuth";
 import toast from "react-hot-toast";
 
 export function useLogin() {
