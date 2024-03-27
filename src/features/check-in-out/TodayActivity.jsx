@@ -36,14 +36,14 @@ const NoActivity = styled.p`
   margin-top: 0.8rem;
 `;
 
-function Today() {
+function TodayActivity() {
   return (
     <StyledToday>
-      <Row type="horizontal">
+      <Row type="hor">
         <Heading as="h2">Today</Heading>
       </Row>
     </StyledToday>
   );
 }
 
-export default Today;
+export default TodayActivity;

@@ -9,7 +9,6 @@ export function useQueryCabin() {
 
   //FILTER
   const filterValue = searchParams.get("discount");
-  console.log(filterValue);
   const filter =
     !filterValue || filterValue === "all"
       ? null
